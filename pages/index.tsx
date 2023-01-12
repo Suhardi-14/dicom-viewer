@@ -111,7 +111,7 @@ export default function Home() {
 
             <Image
               alt="background_illustration"
-              src="/illustration.svg"
+              src="/Illustration.svg"
               className="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
               width={100}
               height={100}
