@@ -103,10 +103,18 @@ export default function Home() {
         </div>
         <div className="mt-12 -mb-16 sm:-mb-48 lg:relative lg:m-0">
           <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
-            <img
+            {/* <img
               className="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
               src="/illustration.svg"
               alt=""
+            /> */}
+
+            <Image
+              alt="background_illustration"
+              src="/illustration.svg"
+              className="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
+              width={100}
+              height={100}
             />
           </div>
         </div>
