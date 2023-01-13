@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import DuerrLogo from "../public/duerr-ndt-logo.png";
 
 const Navbar = () => {
   return (
@@ -9,17 +11,11 @@ const Navbar = () => {
       >
         <div className="flex flex-1 items-center">
           <div className="flex w-full items-center justify-between md:w-auto">
-            <a href="#">
+            <Link href={"/"}>
               <span className="sr-only">Your Company</span>
 
-              <Image
-                alt="duerr-ndt-logo"
-                src="/duerr-ndt-logo.png"
-                className="mb-auto"
-                width={100}
-                height={10}
-              />
-            </a>
+              <Image alt="duerr-ndt-logo" src={DuerrLogo} className="mb-auto" />
+            </Link>
           </div>
         </div>
       </nav>
