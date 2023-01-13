@@ -18,7 +18,7 @@ describe("Home", () => {
     const heading = screen.getByRole("heading", {
       name: /DICOM server/i,
     });
-    logRoles(view.container);
+    // logRoles(view.container);
 
     expect(heading).toBeInTheDocument();
   });
