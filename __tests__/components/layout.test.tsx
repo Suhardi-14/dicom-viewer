@@ -1,10 +1,9 @@
-import { logRoles, render, screen, within } from "@testing-library/react";
-import Container from "../../components/container";
+import { render, screen, within } from "@testing-library/react";
 import Layout from "../../components/layout";
 
 describe("Layout", () => {
   test("renders correctly", () => {
-    const view = render(
+    render(
       <Layout>
         <h1>Hello World</h1>
       </Layout>
