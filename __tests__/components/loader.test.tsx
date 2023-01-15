@@ -1,5 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
-import Container from "../../components/container";
+import { render, screen } from "@testing-library/react";
 import Loading from "../../components/loader";
 
 describe("Loader", () => {
