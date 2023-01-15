@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import DuerrLogo from "../public/duerr-ndt-logo.png";
 
 const Navbar = () => {
   return (
@@ -9,12 +8,18 @@ const Navbar = () => {
         className="relative flex max-w-7xl items-center justify-between px-4 sm:px-6"
         aria-label="Global"
       >
-        <div className="flex flex-1 items-center">
-          <div className="flex w-full items-center justify-between md:w-auto">
-            <Link href={"/"}>
+        <div className="relative flex flex-1 items-center">
+          <div className="relative flex w-full items-center justify-between md:w-auto">
+            <Link href={"/"} className="relative">
               <span className="sr-only">Your Company</span>
 
-              <Image alt="duerr-ndt-logo" src={DuerrLogo} className="mb-auto" />
+              <Image
+                alt="duerr-ndt-logo"
+                src={"/duerr-ndt-logo.png"}
+                className="relative mb-auto"
+                width={150}
+                height={100}
+              />
             </Link>
           </div>
         </div>
