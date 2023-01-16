@@ -62,6 +62,7 @@ export default function Home() {
                 >
                   <TextField
                     label="Patient ID"
+                    name="patient-id"
                     onChange={(e) => {
                       setPatientId(e.target.value);
                     }}
@@ -69,6 +70,7 @@ export default function Home() {
                   />
                   <TextField
                     label="Patient Name"
+                    name="patient-name"
                     onChange={(e) => {
                       setPatientName(e.target.value);
                     }}

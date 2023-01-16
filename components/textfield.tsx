@@ -3,6 +3,7 @@ import { classNames } from "../utils/css-helper";
 
 interface TextFieldProps {
   label?: ReactNode;
+  name?: string;
   placeholder?: string;
   className?: string;
   inputType?: HTMLInputTypeAttribute | undefined;
@@ -14,6 +15,7 @@ interface TextFieldProps {
 const TextField = (props: TextFieldProps) => {
   const {
     label,
+    name,
     placeholder,
     className,
     inputType,
@@ -24,12 +26,12 @@ const TextField = (props: TextFieldProps) => {
   return (
     <div className="min-w-0 flex-1">
       {label && (
-        <label htmlFor="text-input" className="text-white mb-2">
+        <label htmlFor={`text-input-${name}`} className="text-white mb-2">
           {label}
         </label>
       )}
       <input
-        id="text-input"
+        id={`text-input-${name}`}
         type={inputType ?? "text"}
         placeholder={placeholder}
         className={classNames(
