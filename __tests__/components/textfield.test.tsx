@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import user from "@testing-library/user-event";
 import TextField from "../../components/textfield";
 
-describe("Button", () => {
+describe("Textfield", () => {
   test("renders basic textfield correctly", () => {
     render(<TextField />);
     const inputElem = screen.getByRole("textbox");
