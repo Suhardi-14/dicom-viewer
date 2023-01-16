@@ -2,28 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { RenderIf } from "./optional-render";
 import { classNames } from "../utils/css-helper";
 import Button from "./button";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-
-export interface GroupedRowData {
-  group_header: any;
-  grouped_row_data: any[];
-  group_footer?: any;
-}
-interface TableProps {
-  columns: TableColumnProps[];
-  data?: any;
-  selectable?: boolean;
-  selectedItems?: any;
-  setSelectedItems?: any;
-  showCount?: boolean;
-  groupedRow?: boolean;
-  groupedRowData?: GroupedRowData[];
-  onClickBulkEdit?: any;
-  onClickDeleteAll?: any;
-  onNextPage?: any;
-  onPreviousPage?: any;
-  countOffset?: number;
-}
+import {
+  ArrowLeftCircleIcon,
+  ArrowRightCircleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/20/solid";
 
 export interface TableColumnProps {
   title: string | string[] | React.ReactNode;
@@ -32,28 +16,31 @@ export interface TableColumnProps {
   children?: any;
   cell?: (row: any) => React.ReactNode;
 }
+interface TableProps {
+  columns: TableColumnProps[];
+  data?: any;
+  showCount?: boolean;
+  onNextPage?: any;
+  onPreviousPage?: any;
+  perPage?: number;
+  currentPage?: number;
+}
 
 const Table = (props: TableProps) => {
   const {
     columns,
     data,
-    selectable,
-    selectedItems,
-    setSelectedItems,
     showCount,
-    groupedRow,
-    groupedRowData,
-    onClickBulkEdit,
-    onClickDeleteAll,
     onPreviousPage,
     onNextPage,
-    countOffset,
+    perPage = 10,
+    currentPage = 1,
   } = props;
 
   const [isOverflow, setOverflow] = useState(false);
+  const [totalPage, setTotalPage] = useState(null);
   const scrollRef = useRef<HTMLDivElement>();
   const elementRef = useRef<HTMLDivElement>();
-  // const [selectedItems, setSelectedItems] = useState([]);
 
   const onChevronLeftClick = () => {
     const el = scrollRef.current?.children[0];
@@ -69,6 +56,16 @@ const Table = (props: TableProps) => {
       behavior: "auto",
     });
   };
+  useEffect(() => {
+    if (data.length > 0) {
+      const remainder = data.length % perPage;
+      setTotalPage(
+        remainder > 0
+          ? Math.floor(data.length / perPage) + 1
+          : data.length / perPage
+      );
+    }
+  }, [data]);
   useEffect(() => {
     const el = scrollRef.current?.children[0];
 
@@ -94,10 +91,6 @@ const Table = (props: TableProps) => {
   const getColSpan = () => {
     let totalCol = columns?.length;
 
-    if (selectable) {
-      totalCol++;
-    }
-
     if (showCount) {
       totalCol++;
     }
@@ -108,7 +101,11 @@ const Table = (props: TableProps) => {
   return (
     <>
       <div ref={elementRef} className="relative">
-        {/* <div> */}
+        <h1 className="text-white">
+          Showing {currentPage * perPage - perPage + 1} -{" "}
+          {currentPage < totalPage ? currentPage * perPage : data.length} of{" "}
+          {data.length} records
+        </h1>
         {/* <RenderIf isTrue={isOverflow}>
           <div
             className="z-50 fixed mt-16 top-[35%] left-10 bg-gray-100 opacity-25 hover:opacity-100 cursor-pointer rounded-full"
@@ -130,64 +127,14 @@ const Table = (props: TableProps) => {
             <table className="min-w-full divide-y divide-gray-200 ">
               <thead>
                 <tr>
-                  {/* <RenderIf isTrue={selectable}>
+                  <RenderIf isTrue={showCount}>
                     <th
                       className={classNames(
-                        "px-6 py-3 bg-gray-50 text-left text-sm font-semibold text-gray-900"
+                        "px-6 py-3 bg-cyan-100 text-left text-sm font-semibold text-gray-900"
                       )}
                     >
-                      <CheckBox
-                        onChange={(checked) => {
-                          let newArray = [];
-                          if (checked) {
-                            if (!groupedRow) {
-                              newArray = data?.map((row) => row?.id);
-                            }
-                            if (groupedRow) {
-                              const idsArray = groupedRowData?.map((data) => {
-                                let ids = data?.grouped_row_data?.map(
-                                  (row) => row?.id
-                                );
-                                return ids;
-                              });
-
-                              newArray = idsArray?.flat();
-                            }
-                          }
-                          setSelectedItems(newArray);
-                        }}
-                      />
+                      No.
                     </th>
-                  </RenderIf> */}
-                  <RenderIf isTrue={showCount}>
-                    {selectedItems?.length > 0 ? (
-                      <th
-                        className={classNames(
-                          "inline-flex gap-x-2 h-fit py-3 bg-gray-50 text-left text-sm font-semibold text-gray-900"
-                        )}
-                      >
-                        <Button
-                          label={`Bulk Edit`}
-                          //   darkStyle
-                          className="w-fit px-2 whitespace-nowrap"
-                          onClick={onClickBulkEdit}
-                        />
-                        <Button
-                          label={`Delete All`}
-                          //   darkStyle
-                          className="w-fit px-2 whitespace-nowrap"
-                          onClick={onClickDeleteAll}
-                        />
-                      </th>
-                    ) : (
-                      <th
-                        className={classNames(
-                          "px-6 py-3 bg-cyan-100 text-left text-sm font-semibold text-gray-900"
-                        )}
-                      >
-                        No.
-                      </th>
-                    )}
                   </RenderIf>
                   {columns?.map((x, i) => {
                     return (
@@ -210,7 +157,7 @@ const Table = (props: TableProps) => {
                               return <div key={y}>{y}</div>;
                             })
                           ) : (
-                            <div>{x.title}</div>
+                            <div key={i}>{x.title}</div>
                           )}
                         </th>
                       </>
@@ -218,17 +165,13 @@ const Table = (props: TableProps) => {
                   })}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody
+                aria-label="table-body"
+                className="bg-white divide-y divide-gray-200"
+              >
                 <RenderIf
                   isTrue={
-                    (!groupedRow &&
-                      (data === null ||
-                        data === undefined ||
-                        data?.length == 0)) ||
-                    (groupedRow &&
-                      (groupedRowData === null ||
-                        groupedRowData === undefined ||
-                        groupedRowData?.length == 0))
+                    data === null || data === undefined || data?.length == 0
                   }
                 >
                   <tr className="text-center w-96">
@@ -241,328 +184,132 @@ const Table = (props: TableProps) => {
                     </td>
                   </tr>
                 </RenderIf>
-                {/* <RenderIf isTrue={groupedRowData?.length > 0 && groupedRow}>
-                  {groupedRowData?.map((item, idx) => (
-                    <React.Fragment key={item?.group_header}>
-                      <tr className="border-t border-gray-200">
-                        <th
-                          colSpan={getColSpan()}
-                          scope="colgroup"
-                          className="bg-gray-50 px-4 py-2 text-left text-sm font-semibold text-gray-900 sm:px-6"
-                        >
-                          {item?.group_header}
-                        </th>
-                      </tr>
-                      {item?.grouped_row_data?.map((data, dataIdx) => (
-                        <React.Fragment key={data?.id}>
-                          <tr
-                            key={data?.id}
-                            className={`${
-                              selectedItems?.includes(data?.id)
-                                ? "bg-gray-200"
-                                : "bg-white"
-                            }`}
-                          >
-                            <RenderIf isTrue={selectable}>
-                              <td className="px-6 py-4 whitespace-nowrap font-semibold text-sm text-gray-500">
-                                <CheckBox
-                                  onChange={(checked) => {
-                                    setSelectedItems((prevState) => {
-                                      let newArray = checked
-                                        ? [...prevState, data?.id]
-                                        : prevState?.filter(
-                                            (id) => id !== data?.id
-                                          );
-                                      return newArray;
-                                    });
-                                  }}
-                                  defaultCheck={selectedItems?.includes(
-                                    data?.id
-                                  )}
-                                />
-                              </td>
-                            </RenderIf>
-                            <RenderIf isTrue={showCount}>
-                              <td className="px-6 py-4 whitespace-nowrap font-semibold text-sm text-gray-500">
-                                {dataIdx + 1}
-                              </td>
-                            </RenderIf>
-
-                            {columns?.map((x, i) => {
-                              const collapsedData =
-                                i === 0 ? (
-                                  <dl className="font-normal lg:hidden">
-                                    {columns?.map((col, i) => {
-                                      if (
-                                        i > 0 &&
-                                        i < columns?.length - 1 &&
-                                        i < columns?.length - 1
-                                      ) {
-                                        return (
-                                          <>
-                                            <RenderIf
-                                              isTrue={col?.children != null}
-                                            >
-                                              <dt
-                                                key={i}
-                                                className="p-2 text-sm text-gray-900"
-                                              >
-                                                <span className="text-sm font-semibold text-gray-900">
-                                                  {col?.title} :{" "}
-                                                </span>{" "}
-                                                {col?.children}
-                                              </dt>
-                                            </RenderIf>
-                                            {col?.cell && (
-                                              <dt
-                                                key={i}
-                                                className="p-2 text-sm text-gray-900"
-                                              >
-                                                <span className="text-sm font-semibold text-gray-900">
-                                                  {col?.title} :{" "}
-                                                </span>{" "}
-                                                {col?.cell(data)}
-                                              </dt>
-                                            )}
-                                            <RenderIf
-                                              isTrue={
-                                                col?.children == null &&
-                                                col?.cell == null
-                                              }
-                                            >
-                                              <dt
-                                                key={i}
-                                                className="p-2 text-sm text-gray-900"
-                                              >
-                                                <div>
-                                                  <span className="text-sm font-semibold text-gray-900">
-                                                    {col?.title} :{" "}
-                                                  </span>{" "}
-                                                  {data[col?.row]}
-                                                </div>
-                                              </dt>
-                                            </RenderIf>
-                                          </>
-                                        );
-                                      }
-                                    })}
-                                  </dl>
-                                ) : null;
-                              return (
-                                <>
-                                  <RenderIf isTrue={x?.children != null}>
-                                    <td
-                                      key={i}
-                                      className={`px-6 py-4 whitespace-nowrap font-semibold text-sm text-gray-500 ${
-                                        i > 0 && i < columns?.length - 1
-                                          ? "hidden"
-                                          : ""
-                                      } lg:table-cell`}
-                                    >
-                                      {x?.children}
-                                      {i === 0 && collapsedData}
-                                    </td>
-                                  </RenderIf>
-                                  {x?.cell && (
-                                    <td
-                                      key={i}
-                                      className={`px-6 py-4 whitespace-nowrap font-semibold text-sm text-gray-500 ${
-                                        i > 0 && i < columns?.length - 1
-                                          ? "hidden"
-                                          : ""
-                                      } lg:table-cell`}
-                                    >
-                                      {x?.cell(data)}
-                                      {i === 0 && collapsedData}
-                                    </td>
-                                  )}
-                                  <RenderIf
-                                    isTrue={
-                                      x?.children == null && x?.cell == null
-                                    }
-                                  >
-                                    <td
-                                      key={i}
-                                      className={`px-6 py-4 whitespace-nowrap font-semibold text-sm text-gray-500 ${
-                                        i > 0 && i < columns?.length - 1
-                                          ? "hidden"
-                                          : ""
-                                      } lg:table-cell`}
-                                    >
-                                      <div>{data[x?.row]}</div>
-                                      {i === 0 && collapsedData}
-                                    </td>
-                                  </RenderIf>
-                                </>
-                              );
-                            })}
-                          </tr>
-                          <RenderIf isTrue={data?.row_footer}>
-                            <tr
-                              className={`!border-t-0 ${
-                                selectedItems?.includes(data?.id)
-                                  ? "bg-gray-200"
-                                  : "bg-white"
-                              }`}
-                            >
-                              <th
-                                colSpan={getColSpan()}
-                                scope="colgroup"
-                                className="px-6 pb-4 font-semibold text-gray-500"
-                              >
-                                {data?.row_footer}
-                              </th>
-                            </tr>
-                          </RenderIf>
-                        </React.Fragment>
-                      ))}
-                      <RenderIf isTrue={item?.group_footer}>
-                        <tr>
-                          <th
-                            colSpan={getColSpan()}
-                            scope="colgroup"
-                            className="p-4 font-semibold text-gray-500"
-                          >
-                            {item?.group_footer}
-                          </th>
-                        </tr>
-                      </RenderIf>
-                    </React.Fragment>
-                  ))}
-                </RenderIf> */}
-                <RenderIf isTrue={data?.length > 0 && !groupedRow}>
-                  {data?.map((item, idx) => (
-                    <tr key={item.id} className="bg-cyan-50">
-                      {/* <RenderIf isTrue={selectable}>
-                        <td className="px-6 py-4 whitespace-nowrap font-normal text-sm text-gray-500">
-                          <CheckBox
-                            onChange={(checked) => {
-                              setSelectedItems((prevState) => {
-                                let newArray = checked
-                                  ? [...prevState, item?.id]
-                                  : prevState?.filter((id) => id !== item?.id);
-                                return newArray;
-                              });
-                            }}
-                            defaultCheck={
-                              selectedItems?.filter((id) => id === item?.id)
-                                ?.length > 0
-                            }
-                          />
-                        </td>
-                      </RenderIf> */}
-                      <RenderIf isTrue={showCount}>
-                        <td className="px-6 py-4 whitespace-nowrap font-normal text-sm text-gray-500">
-                          {idx + (countOffset ? countOffset : 0) + 1}
-                        </td>
-                      </RenderIf>
-                      {columns?.map((x, i) => {
-                        const collapsedData =
-                          i === 0 ? (
-                            <dl className="font-normal lg:hidden">
-                              {columns?.map((col, i) => {
-                                if (
-                                  i > 0 &&
-                                  i < columns?.length - 1 &&
-                                  i < columns?.length - 1
-                                ) {
-                                  return (
-                                    <>
-                                      <RenderIf isTrue={col?.children != null}>
-                                        <dt
-                                          key={i}
-                                          className="p-2 text-sm text-gray-900"
+                <RenderIf isTrue={data?.length > 0}>
+                  {data
+                    ?.slice(
+                      currentPage * perPage - perPage,
+                      currentPage * perPage
+                    )
+                    ?.map((item, idx) => (
+                      <tr key={item.id} className="bg-cyan-50">
+                        <RenderIf isTrue={showCount}>
+                          <td className="px-6 py-4 whitespace-nowrap font-normal text-sm text-gray-500">
+                            {idx +
+                              (currentPage > 1
+                                ? currentPage * perPage - perPage
+                                : 0) +
+                              1}
+                          </td>
+                        </RenderIf>
+                        {columns?.map((x, i) => {
+                          const collapsedData =
+                            i === 0 ? (
+                              <dl className="font-normal lg:hidden">
+                                {columns?.map((col, i) => {
+                                  if (
+                                    i > 0 &&
+                                    i < columns?.length - 1 &&
+                                    i < columns?.length - 1
+                                  ) {
+                                    return (
+                                      <>
+                                        <RenderIf
+                                          isTrue={col?.children != null}
                                         >
-                                          <span className="text-sm font-semibold text-gray-900">
-                                            {col?.title} :{" "}
-                                          </span>{" "}
-                                          {col?.children}
-                                        </dt>
-                                      </RenderIf>
-                                      {col?.cell && (
-                                        <dt
-                                          key={i}
-                                          className="p-2 text-sm text-gray-900"
-                                        >
-                                          <span className="text-sm font-semibold text-gray-900">
-                                            {col?.title} :{" "}
-                                          </span>{" "}
-                                          {col?.cell(item)}
-                                        </dt>
-                                      )}
-                                      <RenderIf
-                                        isTrue={
-                                          col?.children == null &&
-                                          col?.cell == null
-                                        }
-                                      >
-                                        <dt
-                                          key={i}
-                                          className="p-2 text-sm text-gray-900"
-                                        >
-                                          <div>
+                                          <dt
+                                            key={i}
+                                            className="p-2 text-sm text-gray-900"
+                                          >
                                             <span className="text-sm font-semibold text-gray-900">
                                               {col?.title} :{" "}
                                             </span>{" "}
-                                            {item[col?.row]}
-                                          </div>
-                                        </dt>
-                                      </RenderIf>
-                                    </>
-                                  );
-                                }
-                              })}
-                            </dl>
-                          ) : null;
-                        return (
-                          <>
-                            <RenderIf isTrue={x?.children != null}>
-                              <td
-                                key={i}
-                                className={`px-6 py-4  text-sm text-gray-500 ${
-                                  i > 0 && i < columns?.length - 1
-                                    ? "hidden"
-                                    : ""
-                                } lg:table-cell`}
+                                            {col?.children}
+                                          </dt>
+                                        </RenderIf>
+                                        {col?.cell && (
+                                          <dt
+                                            key={i}
+                                            className="p-2 text-sm text-gray-900"
+                                          >
+                                            <span className="text-sm font-semibold text-gray-900">
+                                              {col?.title} :{" "}
+                                            </span>{" "}
+                                            {col?.cell(item)}
+                                          </dt>
+                                        )}
+                                        <RenderIf
+                                          isTrue={
+                                            col?.children == null &&
+                                            col?.cell == null
+                                          }
+                                        >
+                                          <dt
+                                            key={i}
+                                            className="p-2 text-sm text-gray-900"
+                                          >
+                                            <div>
+                                              <span className="text-sm font-semibold text-gray-900">
+                                                {col?.title} :{" "}
+                                              </span>{" "}
+                                              {item[col?.row]}
+                                            </div>
+                                          </dt>
+                                        </RenderIf>
+                                      </>
+                                    );
+                                  }
+                                })}
+                              </dl>
+                            ) : null;
+                          return (
+                            <>
+                              <RenderIf isTrue={x?.children != null}>
+                                <td
+                                  key={i}
+                                  className={`px-6 py-4  text-sm text-gray-500 ${
+                                    i > 0 && i < columns?.length - 1
+                                      ? "hidden"
+                                      : ""
+                                  } lg:table-cell`}
+                                >
+                                  {x?.children}
+                                  {i === 0 && collapsedData}
+                                </td>
+                              </RenderIf>
+                              {x?.cell && (
+                                <td
+                                  key={i}
+                                  className={`px-6 py-4  font-normal text-sm text-gray-500 ${
+                                    i > 0 && i < columns?.length - 1
+                                      ? "hidden"
+                                      : ""
+                                  } lg:table-cell`}
+                                >
+                                  {x?.cell(item)}
+                                  {i === 0 && collapsedData}
+                                </td>
+                              )}
+                              <RenderIf
+                                isTrue={x?.children == null && x?.cell == null}
                               >
-                                {x?.children}
-                                {i === 0 && collapsedData}
-                              </td>
-                            </RenderIf>
-                            {x?.cell && (
-                              <td
-                                key={i}
-                                className={`px-6 py-4  font-normal text-sm text-gray-500 ${
-                                  i > 0 && i < columns?.length - 1
-                                    ? "hidden"
-                                    : ""
-                                } lg:table-cell`}
-                              >
-                                {x?.cell(item)}
-                                {i === 0 && collapsedData}
-                              </td>
-                            )}
-                            <RenderIf
-                              isTrue={x?.children == null && x?.cell == null}
-                            >
-                              <td
-                                key={i}
-                                className={`px-6 py-4  font-normal text-sm text-gray-500 ${
-                                  i > 0 && i < columns?.length - 1
-                                    ? "hidden"
-                                    : ""
-                                } lg:table-cell`}
-                              >
-                                <div>{item[x?.row]}</div>
-                                {i === 0 && collapsedData}
-                              </td>
-                            </RenderIf>
-                          </>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                  <tr>
+                                <td
+                                  key={i}
+                                  className={`px-6 py-4  font-normal text-sm text-gray-500 ${
+                                    i > 0 && i < columns?.length - 1
+                                      ? "hidden"
+                                      : ""
+                                  } lg:table-cell`}
+                                >
+                                  <div>{item[x?.row]}</div>
+                                  {i === 0 && collapsedData}
+                                </td>
+                              </RenderIf>
+                            </>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  {/* <tr>
                     <td colSpan={getColSpan()} scope="colgroup">
                       <RenderIf
                         isTrue={
@@ -592,9 +339,50 @@ const Table = (props: TableProps) => {
                         </nav>
                       </RenderIf>
                     </td>
-                  </tr>
+                  </tr> */}
                 </RenderIf>
               </tbody>
+
+              <tfoot>
+                <tr>
+                  <td colSpan={getColSpan()} scope="colgroup">
+                    <RenderIf
+                      isTrue={
+                        data !== null && data !== undefined && data?.length != 0
+                      }
+                    >
+                      <nav
+                        className="bg-cyan-100 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+                        aria-label="Pagination"
+                      >
+                        <div className="flex-1 flex justify-between sm:justify-start items-center">
+                          <RenderIf isTrue={currentPage > 1}>
+                            <button
+                              onClick={onPreviousPage}
+                              className="relative inline-flex gap-x-4 items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                              <ArrowLeftCircleIcon width={20} height={20} />
+                              Previous
+                            </button>
+                          </RenderIf>
+                          <RenderIf isTrue={currentPage < totalPage}>
+                            <button
+                              onClick={onNextPage}
+                              className="ml-3 relative inline-flex gap-x-4 items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                              Next{" "}
+                              <ArrowRightCircleIcon width={20} height={20} />
+                            </button>
+                          </RenderIf>
+                        </div>
+                        <p className="text-gray-700 justify-end">
+                          Page {currentPage} of {totalPage}
+                        </p>
+                      </nav>
+                    </RenderIf>
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

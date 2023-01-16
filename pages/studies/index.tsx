@@ -73,13 +73,11 @@ const StudiesListing = () => {
   const [loading, setLoading] = useState(true);
   const [ptId, setPtId] = useState(patientId);
   const [ptName, setPtName] = useState(patientName);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPage: null,
-  });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchStudies = (path) => {
     setLoading(true);
+    setCurrentPage(1);
     fetch(path).then((res) => {
       res.json().then((data) => {
         console.log("STUDIES RECORD", data);
@@ -119,14 +117,15 @@ const StudiesListing = () => {
 
   useEffect(() => {
     if (studies?.length >= 0) setLoading(false);
-
-    if (studies?.length > 0) {
-      setPagination((prevState) => ({
-        ...prevState,
-        totalPage: Math.ceil(studies?.length / 10),
-      }));
-    }
   }, [studies]);
+
+  const onNextPage = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  const onPrevPage = () => {
+    setCurrentPage((prev) => prev - 1);
+  };
 
   return (
     <Layout>
@@ -186,15 +185,10 @@ const StudiesListing = () => {
           columns={column}
           data={studies}
           showCount
-          // countOffset={
-          //   parseInt(filters?.per_ms?.value) * filters?.page -
-          //   parseInt(filters?.per_ms?.value)
-          // }
-          // selectable
-          // selectedItems={selectedItems}
-          // setSelectedItems={setSelectedItems}
-          // onNextPage={onClickNext}
-          // onPreviousPage={onClickPrevious}
+          perPage={10}
+          currentPage={currentPage}
+          onNextPage={onNextPage}
+          onPreviousPage={onPrevPage}
         />
       )}
     </Layout>
