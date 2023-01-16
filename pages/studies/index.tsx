@@ -140,6 +140,7 @@ const StudiesListing = () => {
       >
         <TextField
           label={<span className="text-cyan-700">Patient ID</span>}
+          name="patient-id"
           value={ptId}
           // defaultValue={patientId}
           onChange={(e) => {
@@ -148,6 +149,7 @@ const StudiesListing = () => {
         />
         <TextField
           label={<span className="text-cyan-700">Patient Name</span>}
+          name="patient-name"
           value={ptName}
           // defaultValue={patientName}
           onChange={(e) => {
