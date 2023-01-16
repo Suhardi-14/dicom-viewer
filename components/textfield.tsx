@@ -23,8 +23,13 @@ const TextField = (props: TextFieldProps) => {
   } = props;
   return (
     <div className="min-w-0 flex-1">
-      {label && <label className="text-white mb-2">{label}</label>}
+      {label && (
+        <label htmlFor="text-input" className="text-white mb-2">
+          {label}
+        </label>
+      )}
       <input
+        id="text-input"
         type={inputType ?? "text"}
         placeholder={placeholder}
         className={classNames(
