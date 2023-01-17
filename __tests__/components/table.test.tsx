@@ -1,4 +1,4 @@
-import { logRoles, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import Table, { TableColumnProps } from "../../components/table";
 
 describe("Table", () => {
@@ -27,9 +27,7 @@ describe("Table", () => {
       },
       { firstName: "Pete", lastName: "Mitchell", email: "maverick@usn.com" },
     ];
-    const view = render(<Table columns={tableColumns} data={tableData} />);
-    logRoles(view.container);
-    // screen.debug();
+    render(<Table columns={tableColumns} data={tableData} />);
     const tableHeaders = screen.getAllByRole("columnheader");
 
     expect(tableHeaders).toHaveLength(3);
@@ -81,7 +79,7 @@ describe("Table", () => {
     ];
     let currentPage = 2;
     let perPage = 4;
-    const view = render(
+    render(
       <Table
         columns={tableColumns}
         data={tableDataForPagination}
