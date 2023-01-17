@@ -1,22 +1,18 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../components/button";
 import Layout from "../components/layout";
 import TextField from "../components/textfield";
 
 export default function Home() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null);
   const [patientId, setPatientId] = useState(null);
   const [patientName, setPatientName] = useState(null);
 
   return (
     <Layout>
-      {/* <div className="mx-auto max-w-7xl lg:px-8"> */}
       <div className="lg:grid lg:grid-cols-2 lg:gap-8">
         <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:flex lg:items-center lg:px-0 lg:text-left">
           <div className="lg:py-24">
@@ -53,10 +49,6 @@ export default function Home() {
                   onSubmit={(e) => {
                     console.log(e, "SUBMITTTTTT");
                     e.preventDefault();
-                    // router.push({
-                    //   pathname: "/studies",
-                    //   query: { patientId, patientName },
-                    // });
                   }}
                   className="sm:flex gap-x-4"
                 >
@@ -105,12 +97,6 @@ export default function Home() {
         </div>
         <div className="mt-12 -mb-16 sm:-mb-48 lg:relative lg:m-0">
           <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
-            {/* <img
-              className="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-              src="/illustration.svg"
-              alt=""
-            /> */}
-
             <Image
               alt="background_illustration"
               src="/Illustration.svg"
@@ -121,7 +107,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* </div> */}
     </Layout>
   );
 }

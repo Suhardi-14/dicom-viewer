@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { RenderIf } from "./optional-render";
-import { classNames } from "../utils/css-helper";
-import Button from "./button";
 import {
   ArrowLeftCircleIcon,
   ArrowRightCircleIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
 } from "@heroicons/react/20/solid";
+import React, { useEffect, useRef, useState } from "react";
+import { classNames } from "../utils/css-helper";
+import { RenderIf } from "./optional-render";
 
 export interface TableColumnProps {
   title: string | string[] | React.ReactNode;
@@ -37,25 +34,10 @@ const Table = (props: TableProps) => {
     currentPage = 1,
   } = props;
 
-  const [isOverflow, setOverflow] = useState(false);
   const [totalPage, setTotalPage] = useState(null);
   const scrollRef = useRef<HTMLDivElement>();
   const elementRef = useRef<HTMLDivElement>();
 
-  const onChevronLeftClick = () => {
-    const el = scrollRef.current?.children[0];
-    el?.scrollTo({
-      left: el.scrollLeft - 50,
-      behavior: "auto",
-    });
-  };
-  const onChevronRightClick = () => {
-    const el = scrollRef.current?.children[0];
-    el?.scrollTo({
-      left: el.scrollLeft + 50,
-      behavior: "auto",
-    });
-  };
   useEffect(() => {
     if (data.length > 0) {
       const remainder = data.length % perPage;
@@ -66,27 +48,6 @@ const Table = (props: TableProps) => {
       );
     }
   }, [data]);
-  useEffect(() => {
-    const el = scrollRef.current?.children[0];
-
-    if (el) {
-      if (el.clientWidth >= el.scrollWidth) {
-        setOverflow(false);
-      } else {
-        setOverflow(true);
-        const onWheel = (e) => {
-          if (e.deltaY == 0) return;
-          e.preventDefault();
-          el?.scrollTo({
-            left: el.scrollLeft + e.deltaY,
-            behavior: "auto",
-          });
-        };
-        el?.addEventListener("wheel", onWheel);
-        return () => el?.removeEventListener("wheel", onWheel);
-      }
-    }
-  }, []);
 
   const getColSpan = () => {
     let totalCol = columns?.length;
@@ -106,22 +67,6 @@ const Table = (props: TableProps) => {
           {currentPage < totalPage ? currentPage * perPage : data.length} of{" "}
           {data.length} records
         </h1>
-        {/* <RenderIf isTrue={isOverflow}>
-          <div
-            className="z-50 fixed mt-16 top-[35%] left-10 bg-gray-100 opacity-25 hover:opacity-100 cursor-pointer rounded-full"
-            onClick={onChevronLeftClick}
-          >
-            <ChevronLeftIcon className=" " height={50} />
-          </div>
-        </RenderIf>
-        <RenderIf isTrue={isOverflow}>
-          <div
-            className="z-50 fixed mt-16 top-[35%] right-10 bg-gray-100 opacity-25 hover:opacity-100 cursor-pointer rounded-full"
-            onClick={onChevronRightClick}
-          >
-            <ChevronRightIcon className="  " height={50} />
-          </div>
-        </RenderIf> */}
         <div className="flex flex-col mt-2 font-['Inter var']" ref={scrollRef}>
           <div className="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
             <table className="min-w-full divide-y divide-gray-200 ">
@@ -309,37 +254,6 @@ const Table = (props: TableProps) => {
                         })}
                       </tr>
                     ))}
-                  {/* <tr>
-                    <td colSpan={getColSpan()} scope="colgroup">
-                      <RenderIf
-                        isTrue={
-                          data !== null &&
-                          data !== undefined &&
-                          data?.length != 0
-                        }
-                      >
-                        <nav
-                          className="bg-cyan-100 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-                          aria-label="Pagination"
-                        >
-                          <div className="flex-1 flex justify-between sm:justify-start">
-                            <button
-                              onClick={onPreviousPage}
-                              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                            >
-                              Previous
-                            </button>
-                            <button
-                              onClick={onNextPage}
-                              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                            >
-                              Next
-                            </button>
-                          </div>
-                        </nav>
-                      </RenderIf>
-                    </td>
-                  </tr> */}
                 </RenderIf>
               </tbody>
 

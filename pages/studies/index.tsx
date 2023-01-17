@@ -148,7 +148,6 @@ const StudiesListing = () => {
           label={<span className="text-cyan-700">Patient ID</span>}
           name="patient-id"
           value={ptId}
-          // defaultValue={patientId}
           onChange={(e) => {
             setPtId(e.target.value);
           }}
@@ -157,7 +156,6 @@ const StudiesListing = () => {
           label={<span className="text-cyan-700">Patient Name</span>}
           name="patient-name"
           value={ptName}
-          // defaultValue={patientName}
           onChange={(e) => {
             setPtName(e.target.value);
           }}
@@ -176,8 +174,8 @@ const StudiesListing = () => {
           />
           <Button
             onClick={() => {
-              setPtId(null);
-              setPtName(null);
+              setPtId("");
+              setPtName("");
               let path = `/api/studies`;
               fetchStudies(path);
             }}
