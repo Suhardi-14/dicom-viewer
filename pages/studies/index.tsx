@@ -1,3 +1,4 @@
+import moment from "moment";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Breadcrumbs from "../../components/breadcrumbs";
@@ -7,65 +8,6 @@ import Loading from "../../components/loader";
 import Table, { TableColumnProps } from "../../components/table";
 import TextField from "../../components/textfield";
 
-const column: TableColumnProps[] = [
-  {
-    title: "Patient Name",
-    cell: (row) => (
-      <div>
-        <span className="block">{row?.PatientName}</span>
-      </div>
-    ),
-  },
-  {
-    title: "Patient ID",
-    cell: (row) => (
-      <div>
-        <span className="block ">{row?.PatientID}</span>
-      </div>
-    ),
-  },
-  {
-    title: "Study Date",
-    cell: (row) => (
-      <div>
-        <span className="block">{row?.StudyDate}</span>
-      </div>
-    ),
-  },
-  {
-    title: "Study Description",
-    cell: (row) => (
-      <div>
-        <span className="flex-wrap">{row?.StudyDescription}</span>
-      </div>
-    ),
-  },
-  {
-    title: "Accession Number",
-    cell: (row) => (
-      <div>
-        <span className="block">{row?.AccessionNumber}</span>
-      </div>
-    ),
-  },
-  {
-    title: "Specific Character Set",
-    cell: (row) => (
-      <div>
-        <span className="block">{row?.SpecificCharacterSet}</span>
-      </div>
-    ),
-  },
-  {
-    title: "Action",
-    cell: (row) => (
-      <div className="whitespace-nowrap">
-        <Button label="View Details" />
-      </div>
-    ),
-  },
-];
-
 const StudiesListing = () => {
   const router = useRouter();
   const { patientId, patientName } = router.query;
@@ -74,6 +16,70 @@ const StudiesListing = () => {
   const [ptId, setPtId] = useState(patientId);
   const [ptName, setPtName] = useState(patientName);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const column: TableColumnProps[] = [
+    {
+      title: "Patient Name",
+      cell: (row) => (
+        <div>
+          <span className="block">{row?.PatientName}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Patient ID",
+      cell: (row) => (
+        <div>
+          <span className="block ">{row?.PatientID}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Study Date",
+      cell: (row) => (
+        <div>
+          <span className="block">{row?.StudyDate}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Study Description",
+      cell: (row) => (
+        <div>
+          <span className="flex-wrap">{row?.StudyDescription}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Accession Number",
+      cell: (row) => (
+        <div>
+          <span className="block">{row?.AccessionNumber}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Specific Character Set",
+      cell: (row) => (
+        <div>
+          <span className="block">{row?.SpecificCharacterSet}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Action",
+      cell: (row) => (
+        <div className="whitespace-nowrap">
+          <Button
+            label="View Details"
+            onClick={() => {
+              router.push(`/studies/${row?.StudyInstanceUID}`);
+            }}
+          />
+        </div>
+      ),
+    },
+  ];
 
   const fetchStudies = (path) => {
     setLoading(true);
@@ -96,7 +102,7 @@ const StudiesListing = () => {
             StudyInstanceUID,
             PatientName,
             PatientID,
-            StudyDate: new Date(StudyDate).toDateString(),
+            StudyDate: moment(StudyDate, "YYYYMMDD").format("L"),
             StudyDescription,
             AccessionNumber,
             SpecificCharacterSet,

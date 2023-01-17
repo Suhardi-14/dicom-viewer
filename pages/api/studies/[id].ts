@@ -1,12 +1,12 @@
-export default function handler(req, res) {
-  const {
-    query: { PatientID, PatientName },
-  } = req;
-  console.log("PatientID, PatientName", [PatientID, PatientName]);
-  const dcmjsDimse = require("dcmjs-dimse");
+import dcmjsDimse from "dcmjs-dimse";
+
+const handler = (req, res) => {
   const { Client, Server, Scp, Dataset } = dcmjsDimse;
   const { CFindRequest } = dcmjsDimse.requests;
   const { Status } = dcmjsDimse.constants;
+  const {
+    query: { id },
+  } = req;
 
   const host = "www.dicomserver.co.uk";
   const port = 104;
@@ -15,13 +15,12 @@ export default function handler(req, res) {
   let result = [];
 
   const client = new Client();
-  const request = CFindRequest.createStudyFindRequest({
-    PatientID: PatientID ?? "*",
-    PatientName: PatientName ?? "*",
+  const request = CFindRequest.createSeriesFindRequest({
+    StudyInstanceUID: id,
   });
   request.on("response", (response) => {
     if (response.getStatus() === Status.Pending && response.hasDataset()) {
-      //   console.log(response.getDataset());
+      // console.log(response.getDataset());
       result.push(response.getDataset());
     } else {
       res.statusCode = 200;
@@ -32,4 +31,6 @@ export default function handler(req, res) {
   client.send(host, port, callingAeTitle, calledAeTitle);
 
   return res;
-}
+};
+
+export default handler;
