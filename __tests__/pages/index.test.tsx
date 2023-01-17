@@ -1,8 +1,8 @@
-import { logRoles, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import user from "@testing-library/user-event";
+import { RouterContext } from "next/dist/shared/lib/router-context";
 import Home from "../../pages/index";
 import { createMockRouter } from "../../test-utils/createMockRouter";
-import { RouterContext } from "next/dist/shared/lib/router-context";
-import user from "@testing-library/user-event";
 
 describe("Home", () => {
   user.setup();

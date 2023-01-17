@@ -1,4 +1,4 @@
-import { logRoles, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { RouterContext } from "next/dist/shared/lib/router-context";
 import Button from "../../../components/button";
 import { TableColumnProps } from "../../../components/table";
@@ -66,13 +66,11 @@ describe("Studies Listing", () => {
     },
   ];
   test("renders correctly", async () => {
-    const view = render(
+    render(
       <RouterContext.Provider value={createMockRouter({})}>
         <StudiesListing />
       </RouterContext.Provider>
     );
-
-    logRoles(view.container);
 
     const link = screen.getByRole("link", {
       name: /your company duerr\-ndt\-logo/i,
