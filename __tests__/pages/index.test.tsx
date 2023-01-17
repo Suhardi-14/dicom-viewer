@@ -7,13 +7,11 @@ import user from "@testing-library/user-event";
 describe("Home", () => {
   user.setup();
   test("renders correctly", () => {
-    const view = render(
+    render(
       <RouterContext.Provider value={createMockRouter({})}>
         <Home />
       </RouterContext.Provider>
     );
-
-    // logRoles(view.container);
 
     const link = screen.getByRole("link", {
       name: /your company duerr\-ndt\-logo/i,
@@ -62,13 +60,11 @@ describe("Home", () => {
     const inputId = "5132651546546";
     const inputName = "Mikhail Gorbachev";
 
-    const view = render(
+    render(
       <RouterContext.Provider value={createMockRouter({})}>
         <Home />
       </RouterContext.Provider>
     );
-
-    logRoles(view.container);
 
     const idField = screen.getByRole("textbox", { name: /patient id/i });
     const nameField = screen.getByRole("textbox", { name: /patient name/i });
